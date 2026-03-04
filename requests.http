@@ -1,0 +1,29 @@
+### Вычислить индекс массы тела (POST)
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight":98,
+  "height": 1.73}
+
+
+### Вычислить индекс массы тела (POST)
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight":55,
+  "height": 1.73}
+
+### Проверить, что сервер возвращает 400 при некорректном JSON (необязательно)
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight1":98,
+  "height": 1.73}
+
+
+### GET /api/getAll для получения всех результатов
+GET http://localhost:8080/api/getAll
+Accept: application/json
