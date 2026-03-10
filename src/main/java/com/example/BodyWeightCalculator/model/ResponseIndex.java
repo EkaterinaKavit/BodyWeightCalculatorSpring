@@ -1,4 +1,5 @@
 package com.example.BodyWeightCalculator.model;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ResponseIndex {
@@ -7,17 +8,19 @@ public class ResponseIndex {
     private double weight;
     private double height;
     private double index;
-    private LocalDateTime date;
+    private LocalDate date;
+    private String category;
 
     public ResponseIndex() {
     }
 
-    public ResponseIndex(Long id,double weight, double height,double index, LocalDateTime date) {
+    public ResponseIndex(Long id,double weight, double height,double index, LocalDate date, String category) {
         this.weight = weight;
         this.height = height;
         this.id = id;
         this.index = index;
         this.date = date;
+        this.category = category;
     }
 
     public Long getId() {
@@ -52,11 +55,19 @@ public class ResponseIndex {
         this.index = index;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

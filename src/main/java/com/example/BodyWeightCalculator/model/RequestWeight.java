@@ -1,8 +1,21 @@
 package com.example.BodyWeightCalculator.model;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 public class RequestWeight {
-    private double weight;
-    private double height;
+
+    @NotNull(message ="Вес не может быть пустым")
+    @Min(value=1, message = "Вес должен быть больше 0")
+    @Max(value=250, message = "Вес должен быть меньше 250")
+
+    private Double weight;
+
+    @NotNull(message ="Рост не может быть пустым")
+    @Min(value=1, message = "Рост должен быть больше 0")
+    @Max(value=250, message = "Рост должен быть меньше 250")
+    private Double height;
 
     public RequestWeight() {
     }

@@ -15,15 +15,52 @@ Content-Type: application/json
   "weight":55,
   "height": 1.73}
 
-### Проверить, что сервер возвращает 400 при некорректном JSON (необязательно)
+### Вычислить индекс массы тела (POST)
 POST http://localhost:8080/api/calculator
 Content-Type: application/json
 
 {
-  "weight1":98,
+  "weight":65,
   "height": 1.73}
+
+### Проверяем ошибку валидации
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight":-98,
+  "height": 251}
+
+### Проверяем неправильное название категории
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight000":-98,
+  "height": 251}
+
 
 
 ### GET /api/getAll для получения всех результатов
 GET http://localhost:8080/api/getAll
+Accept: application/json
+
+
+
+### GET /api/ поиск по id
+GET http://localhost:8080/api/2
+Accept: application/json
+
+### DELETE /api/ удаление по id
+DELETE http://localhost:8080/api/2
+Accept: application/json
+
+
+### DELETE /api/ удаление всех записей
+DELETE http://localhost:8080/api/deleteAll
+Accept: application/json
+
+
+### GET /api/ получение статистики
+GET http://localhost:8080/api/statistics
 Accept: application/json
