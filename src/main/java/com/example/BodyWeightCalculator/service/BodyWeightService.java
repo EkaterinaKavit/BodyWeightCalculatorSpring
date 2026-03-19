@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.Result;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -139,5 +140,36 @@ public class BodyWeightService {
         }
 
         return category;
+    }
+
+    public List<ResponseIndex> filterByCategory(String newCategory){
+        log.debug("Фильтрация по категории: '{}'", newCategory);
+        List<ResultEntity> entities = repository.findByCategory(newCategory);
+        log.debug("Найдено сущностей: {}", entities.size());
+        List<ResponseIndex> results = new ArrayList<>();
+        for (ResultEntity e:entities){
+            results.add(new ResponseIndex(e.getId(), e.getWeight(), e.getHeight(),e.getIndex(), e.getDate(),e.getCategory()));
+
+        }
+        log.debug("Возвращаем DTO: {}", results.size());
+        return results;
+    }
+
+    public List<ResponseIndex> findByDate(LocalDate dateForSearching){
+        List<ResultEntity> entities = repository.findByDate(dateForSearching);
+        List<ResponseIndex> resultsOfSearching = new ArrayList<>();
+        for (ResultEntity e:entities){
+            resultsOfSearching.add(new ResponseIndex(e.getId(),e.getWeight(),e.getHeight(),e.getIndex(),e.getDate(),e.getCategory()));
+        }
+        return  resultsOfSearching;
+    }
+
+    public List<ResponseIndex> findByDateBetween(LocalDate start, LocalDate end){
+        List<ResultEntity> entities = repository.findByDateBetween(start,end);
+        List<ResponseIndex> resultsOfSearching = new ArrayList<>();
+        for (ResultEntity e:entities){
+            resultsOfSearching.add(new ResponseIndex(e.getId(),e.getWeight(),e.getHeight(),e.getIndex(),e.getDate(),e.getCategory()));
+        }
+        return  resultsOfSearching;
     }
 }

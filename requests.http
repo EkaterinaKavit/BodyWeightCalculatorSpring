@@ -3,7 +3,7 @@ POST http://localhost:8080/api/calculator
 Content-Type: application/json
 
 {
-  "weight":83,
+  "weight":80,
   "height": 1.65}
 
 
@@ -12,7 +12,7 @@ POST http://localhost:8080/api/calculator
 Content-Type: application/json
 
 {
-  "weight":61,
+  "weight":62,
   "height": 1.60}
 
 ### Вычислить индекс массы тела (POST)
@@ -73,3 +73,17 @@ Content-Type: application/json
 {
   "updatedWeight":64
   }
+
+
+### GET /api/ фильтрация по категории, %20 - то кодировка пробела
+GET http://localhost:8080/api/filter?newCategory=нормальный%20вес
+Accept: application/
+
+
+### GET /api/ фильтрация по дате
+GET http://localhost:8080/api/filter_for_date?dateForSearching=2026-03-19
+Accept: application/json
+
+### GET /api/ фильтрация по временному периоду
+GET http://localhost:8080/api/filter_by_date_period?startDate=2026-03-18&endDate=2026-03-19
+Accept: application/json

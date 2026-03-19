@@ -8,6 +8,7 @@ import com.example.BodyWeightCalculator.model.UpdatedWeightRequest;
 import com.example.BodyWeightCalculator.service.BodyWeightService;
 import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
+import jdk.jfr.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,5 +71,20 @@ public class BodyCalculatorController {
     @PutMapping("/{id}")
     public ResponseIndex updateWeightById(@PathVariable Long id, @RequestBody UpdatedWeightRequest updatedWeight){
         return service.updateWeightById(id,updatedWeight.getUpdatedWeight());
+    }
+
+    @GetMapping("/filter")
+    public List<ResponseIndex> filterCategory(@RequestParam String newCategory){
+        return service.filterByCategory(newCategory);
+    }
+
+    @GetMapping("/filter_for_date")
+    public List<ResponseIndex> filterDate(@RequestParam LocalDate dateForSearching){
+        return  service.findByDate(dateForSearching);
+    }
+
+    @GetMapping("/filter_by_date_period")
+    public List<ResponseIndex> filterByPeriod(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate){
+        return  service.findByDateBetween(startDate,endDate);
     }
 }
