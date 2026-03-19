@@ -36,10 +36,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String,String>> handleGenericException(Exception exception){
-        Map<String,String> errors = new HashMap<>();
-        errors.put("error", "произошла внутренняя ошибка сервера");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Map<String,String>> handleGenericException(Exception exception){
+//        Map<String,String> errors = new HashMap<>();
+//        errors.put("error", "произошла внутренняя ошибка сервера");
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errors);
+//    }
 }

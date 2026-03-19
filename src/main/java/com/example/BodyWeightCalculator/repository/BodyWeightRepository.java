@@ -1,9 +1,14 @@
+
+//Используется для in-memory хранилища, для базы данных используется ResultJPARepository
 package com.example.BodyWeightCalculator.repository;
 
 
+import com.example.BodyWeightCalculator.controller.BodyCalculatorController;
 import com.example.BodyWeightCalculator.model.RequestWeight;
 import com.example.BodyWeightCalculator.model.ResponseIndex;
 import org.springframework.stereotype.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BodyWeightRepository implements BodyWeightInterface{
 
     private final ConcurrentHashMap<Long, ResponseIndex> results = new ConcurrentHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(BodyWeightRepository.class);
     AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
@@ -44,4 +50,5 @@ public class BodyWeightRepository implements BodyWeightInterface{
     public void deleteAll() {
         results.clear();
     }
+
 }

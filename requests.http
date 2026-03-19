@@ -3,8 +3,8 @@ POST http://localhost:8080/api/calculator
 Content-Type: application/json
 
 {
-  "weight":98,
-  "height": 1.73}
+  "weight":83,
+  "height": 1.65}
 
 
 ### Вычислить индекс массы тела (POST)
@@ -12,16 +12,16 @@ POST http://localhost:8080/api/calculator
 Content-Type: application/json
 
 {
-  "weight":55,
-  "height": 1.73}
+  "weight":61,
+  "height": 1.60}
 
 ### Вычислить индекс массы тела (POST)
 POST http://localhost:8080/api/calculator
 Content-Type: application/json
 
 {
-  "weight":65,
-  "height": 1.73}
+  "weight":56,
+  "height": 1.55}
 
 ### Проверяем ошибку валидации
 POST http://localhost:8080/api/calculator
@@ -64,3 +64,12 @@ Accept: application/json
 ### GET /api/ получение статистики
 GET http://localhost:8080/api/statistics
 Accept: application/json
+
+
+### Обновить вес
+PUT http://localhost:8080/api/43
+Content-Type: application/json
+
+{
+  "updatedWeight":64
+  }
