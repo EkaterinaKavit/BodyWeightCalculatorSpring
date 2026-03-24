@@ -1,8 +1,10 @@
 package com.example.BodyWeightCalculator.service;
 
 import com.example.BodyWeightCalculator.entity.ResultEntity;
+import com.example.BodyWeightCalculator.entity.User;
 import com.example.BodyWeightCalculator.exceptions.ResourceNotFoundException;
 import com.example.BodyWeightCalculator.jpa.ResultJPARepository;
+import com.example.BodyWeightCalculator.jpa.UserRepository;
 import com.example.BodyWeightCalculator.model.ResponseIndex;
 import com.example.BodyWeightCalculator.model.StatisticsData;
 import com.example.BodyWeightCalculator.repository.BodyWeightRepository;
@@ -21,27 +23,34 @@ import java.util.List;
 
 @Service
 public class BodyWeightService {
+
     private final ResultJPARepository repository;
+    private final UserService userService;
     private static final Logger log = LoggerFactory.getLogger(BodyWeightService.class);
 
+
     @Autowired
-    public BodyWeightService(ResultJPARepository repository) {
+    public BodyWeightService(ResultJPARepository repository, UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
-    public ResponseIndex calculateIndex(double weight, double height){
-        log.debug("Вычисление индекса для weight={}, height={}", weight, height);
+
+    public ResponseIndex calculateIndex(double weight, double height, Long userID){
+        log.debug("Вычисление индекса для weight={}, height={}, user={}", weight, height,userID);
+        //User user = userRepository.findById(userID).orElseThrow(() -> new ResourceNotFoundException("Не найден пользователь с id " + userID));
+        User user = userService.getUserById(userID);
         double index = weight/(height*height);
         LocalDate date = LocalDate.now();
         String category = determineCategory(index);
         log.debug("Индекс={}, категория={}", index, category);
 
         //Создаем сущность
-        ResultEntity entity = new ResultEntity(weight,height,index,category,date);
+        ResultEntity entity = new ResultEntity(weight,height,index,category,date,user);
 
         //Сохраняем в БД
         ResultEntity saved = repository.save(entity);
-        log.info("Сохранён результат id={}", saved.getId());
+        log.info("Сохранён результат id={} для пользователя {}", saved.getId(), user.getName());
         log.debug("DTO сформирован: id={}", saved.getId());
 
         //преобразуем в ResponseIndex для ответа

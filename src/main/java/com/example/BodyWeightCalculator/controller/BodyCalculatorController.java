@@ -33,9 +33,9 @@ public class BodyCalculatorController {
     }
 
     @PostMapping("/calculator")
-    public ResponseEntity<ResponseIndex> calculateBodyIndex(@Valid @RequestBody RequestWeight requestWeight){
+    public ResponseEntity<ResponseIndex> calculateBodyIndex(@Valid @RequestBody RequestWeight requestWeight, @RequestParam Long userId){
         log.info("Получен запрос на расчёт индекса: вес={}, рост={}", requestWeight.getWeight(), requestWeight.getHeight());
-        ResponseIndex responseIndex = service.calculateIndex(requestWeight.getWeight(), requestWeight.getHeight());
+        ResponseIndex responseIndex = service.calculateIndex(requestWeight.getWeight(), requestWeight.getHeight(),userId);
         log.info("Рассчитан индекс id={}, значение={}", responseIndex.getId(), responseIndex.getIndex());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseIndex);
     }

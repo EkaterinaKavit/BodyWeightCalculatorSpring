@@ -1,5 +1,6 @@
 package com.example.BodyWeightCalculator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -18,15 +19,21 @@ public class ResultEntity {
     private String category;
     private LocalDate date;
 
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    @JsonIgnore
+    private User user;
+
     public ResultEntity() {
     }
 
-    public ResultEntity(double weight, double height, double index, String category, LocalDate date) {
+    public ResultEntity(double weight, double height, double index, String category, LocalDate date, User user) {
         this.weight = weight;
         this.height = height;
         this.index = index;
         this.category = category;
         this.date = date;
+        this.user=user;
     }
 
 
@@ -76,5 +83,13 @@ public class ResultEntity {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

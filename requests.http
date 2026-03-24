@@ -1,18 +1,18 @@
 ### Вычислить индекс массы тела (POST)
-POST http://localhost:8080/api/calculator
+POST http://localhost:8080/api/calculator?userId=8
 Content-Type: application/json
 
 {
-  "weight":80,
-  "height": 1.65}
+  "weight":79,
+  "height": 1.80}
 
 
 ### Вычислить индекс массы тела (POST)
-POST http://localhost:8080/api/calculator
+POST http://localhost:8080/api/calculator?userId=9
 Content-Type: application/json
 
 {
-  "weight":62,
+  "weight":64,
   "height": 1.60}
 
 ### Вычислить индекс массы тела (POST)
@@ -86,4 +86,33 @@ Accept: application/json
 
 ### GET /api/ фильтрация по временному периоду
 GET http://localhost:8080/api/filter_by_date_period?startDate=2026-03-18&endDate=2026-03-19
+Accept: application/json
+
+
+### создаем нового пользователя (POST)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "name": "Anna",
+  "email": "ovcharnikova@yandex.ru"}
+
+### создаем нового пользователя (POST)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "name": "Alena",
+  "email": "Volkova@yandex.ru"}
+
+### создаем нового пользователя (POST)
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+  {
+    "name": "Afina",
+    "email": "krasivaya@yandex.ru"}
+
+### GET /api/
+GET http://localhost:8080/api/users/6/results
 Accept: application/json
