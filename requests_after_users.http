@@ -1,0 +1,148 @@
+### ========== РАБОТА С ПОЛЬЗОВАТЕЛЯМИ ==========
+
+
+###  создаем нового пользователя
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "name": "Semen Kotov",
+  "email": "kotov@yandex.ru"}
+
+
+
+
+
+### Получение всех  замеров пользователя 19
+GET http://localhost:8080/api/users/19/results
+Accept: application/json
+
+
+###Получение последнего замера пользователя по его id 19
+GET http://localhost:8080/api/users/19/last-result
+Accept: application/json
+
+### DELETE /api/ удаление всех записей посетителя 15
+DELETE http://localhost:8080/api/users/15/deleteResults
+Accept: application/json
+
+### ========== РАБОТА С ЗАМЕРАМИ ==========
+
+### Создать замер для пользователя 19
+POST http://localhost:8080/api/calculator?userId=19
+Content-Type: application/json
+
+{
+  "weight":90,
+  "height": 1.90}
+
+
+### Создать замер для пользователя 19
+POST http://localhost:8080/api/calculator?userId=19
+Content-Type: application/json
+
+{
+  "weight":89.5,
+  "height": 1.90}
+
+### Создать замер для пользователя 15
+POST http://localhost:8080/api/calculator?userId=15
+Content-Type: application/json
+
+{
+  "weight":63,
+  "height": 1.59}
+
+### Создать второй  замер для пользователя 15
+POST http://localhost:8080/api/calculator?userId=15
+Content-Type: application/json
+
+{
+  "weight":62,
+  "height": 1.59}
+
+### Проверяем ошибку валидации
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight":-98,
+  "height": 251}
+
+### Проверяем неправильное название категории
+POST http://localhost:8080/api/calculator
+Content-Type: application/json
+
+{
+  "weight000":-98,
+  "height": 251}
+
+
+
+### Получить все замеры с пагинацией
+GET http://localhost:8080/api/getAll?page=0&size=2&sort=date,desc
+Accept: application/json
+
+
+
+### Получить замер по id
+GET http://localhost:8080/api/58
+Accept: application/json
+
+### Обновить вес замера 58
+PUT http://localhost:8080/api/58
+Content-Type: application/json
+
+{
+  "updatedWeight":62.1
+  }
+
+
+### Обновление роста в замере 58
+PUT http://localhost:8080/api/58/height
+Content-Type: application/json
+
+{
+  "newHeight": 1.58
+}
+
+### Удаление замера по id 58
+DELETE http://localhost:8080/api/58
+Accept: application/json
+
+
+### Удаление ВСЕХ замеров
+DELETE http://localhost:8080/api/deleteAll
+Accept: application/json
+
+### ========== Статистика и фильтры ==========
+
+### Получение статистики
+GET http://localhost:8080/api/statistics
+Accept: application/json
+
+
+### Фильтрация по категории, %20 - то кодировка пробела
+GET http://localhost:8080/api/filter?newCategory=нормальный%20вес
+Accept: application/json
+
+
+### Фильтрация по дате
+GET http://localhost:8080/api/filter_for_date?dateForSearching=2026-04-12
+Accept: application/json
+
+### Фильтрация по временному периоду
+GET http://localhost:8080/api/filter_by_date_period?startDate=2026-03-18&endDate=2026-03-19
+Accept: application/json
+
+
+### Получить статистику пользователя с id=17
+GET http://localhost:8080/api/users/17/statistics
+Accept: application/json
+
+
+
+
+
+
+

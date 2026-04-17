@@ -7,8 +7,12 @@ import com.example.BodyWeightCalculator.jpa.ResultJPARepository;
 import com.example.BodyWeightCalculator.jpa.UserRepository;
 import com.example.BodyWeightCalculator.model.ResponseIndex;
 import com.example.BodyWeightCalculator.model.StatisticsData;
+import com.example.BodyWeightCalculator.model.UpdatedHeightRequest;
 import com.example.BodyWeightCalculator.repository.BodyWeightRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -16,16 +20,23 @@ import org.slf4j.LoggerFactory;
 
 
 import javax.xml.transform.Result;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Сервисный слой для бизнес-логики, связанной с замерами
+ * Взаимодействует с ResultJPARepository для работы с базой данных и UserService для получения информации о пользователях
+ */
 @Service
 public class BodyWeightService {
 
     private final ResultJPARepository repository;
     private final UserService userService;
+    /**
+     * Логгер для записи событий в файл и консоль
+     */
     private static final Logger log = LoggerFactory.getLogger(BodyWeightService.class);
 
 
@@ -35,7 +46,13 @@ public class BodyWeightService {
         this.userService = userService;
     }
 
-
+    /**
+     *  Вычисляет индекс, категорию и сохраняет замер для пользователя
+     * @param weight вес в килограммах
+     * @param height рост в метрах
+     * @param userID идентификатор пользователя, которому принадлежит замер
+     * @return DTO(data transfer object) с сохраненным замером
+     */
     public ResponseIndex calculateIndex(double weight, double height, Long userID){
         log.debug("Вычисление индекса для weight={}, height={}, user={}", weight, height,userID);
         //User user = userRepository.findById(userID).orElseThrow(() -> new ResourceNotFoundException("Не найден пользователь с id " + userID));
@@ -57,14 +74,26 @@ public class BodyWeightService {
         return new ResponseIndex(saved.getId(), saved.getWeight(), saved.getHeight(), saved.getIndex(), saved.getDate(), saved.getCategory());
     }
 
-    public List<ResponseIndex> getAllresults(){
+    /**
+     * Возвращает страницу всех замеров с пагинацией
+     * @param pageable  параметры пагинации (количество результатов на странице, номер страницы)
+     * @return страница с DTO замеров
+     */
+    public Page<ResponseIndex> getAllresults(Pageable pageable){   //добавлена пагинация
         log.debug("Запрос всех записей из БД");
-        List<ResponseIndex> results = repository.findAll().stream()
+        Page <ResultEntity> entitiesPage = repository.findAll(pageable);
+        Page<ResponseIndex> page = entitiesPage
                 .map(e -> new ResponseIndex(e.getId(), e.getWeight(), e.getHeight(), e.getIndex(),
-                        e.getDate(), e.getCategory())).toList();
-        log.debug("Получено {} записей", results.size());
-        return results;
+                        e.getDate(), e.getCategory()));
+        log.debug("Получено {} записей (страница {})", page.getNumberOfElements(), page.getNumber());
+        return page;
     }
+
+    /**
+     * Возвращает информацию по идентификатору пользователя
+     * @param id идентификатор пользователя
+     * @return DTO c замерами
+     */
 
     public ResponseIndex getDataById(Long id){
          log.debug("Поиск записи по id={}", id);
@@ -73,6 +102,11 @@ public class BodyWeightService {
          return new ResponseIndex(entity.getId(), entity.getWeight(), entity.getHeight(), entity.getIndex(), entity.getDate(), entity.getCategory());
     }
 
+    /**
+     * Удаление записи по идентификатору
+     * @param id идентификатор пользователя
+     * если идентификато не найден, то выбрасывается исключение о несуществующей записи
+     */
     public void deleteById(Long id){
         log.debug("Удаление записи по id={}", id);
 
@@ -84,12 +118,23 @@ public class BodyWeightService {
         log.info("Запись id={} успешно удалена", id);
     }
 
+
+
+    /**
+     * удаление всех записей
+     */
+
     public void deleteAll(){
         log.debug("Удаление всех записей");
         repository.deleteAll();
         log.info("Все записи удалены");
     }
 
+
+    /**
+     * Получение статистики: минимальный, максимальный вес,средний индекс, количество замеров
+     * @return возвращает обьект класса StatisticsData, содержащий вычисленные значения
+     */
     public StatisticsData getStatistics(){
 
         log.debug("Вычисление статистики");
@@ -120,6 +165,14 @@ public class BodyWeightService {
 
     }
 
+    /**
+     * Обновление веса по идентификатору пользователя, пересчитывает индес и категорию
+     * @param id идентификатор пользователя
+     * @param newWeight новый вес в килограммах
+     * @return возвращает DTO с обновленными данными
+     * @throws ResourceNotFoundException, если запись с таким id не найдена
+     */
+
     public ResponseIndex updateWeightById(Long id, double newWeight){
         ResultEntity entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Запись с id " + id + " не найдена"));
         entity.setWeight(newWeight);
@@ -132,6 +185,31 @@ public class BodyWeightService {
 
     }
 
+
+    /**
+     * Обновление роста по идентификатору пользователя, пересчитывает индес и категорию
+     * @param id идентификатор пользователя
+     * @param newHeight новый рост в метрах
+     * @return возвращает DTO с обновленными данными
+     * @throws ResourceNotFoundException, если запись с таким id не найдена
+     */
+    public ResponseIndex updateHeightById(Long id, double newHeight){
+        ResultEntity updated = repository.findById(id).orElseThrow(() ->new ResourceNotFoundException("Записьа с id "+id+" не найдена"));
+        updated.setHeight(newHeight);
+        double updatedIndex = updated.getWeight()/ (updated.getHeight()* updated.getHeight());
+        String updatedCategory = determineCategory(updatedIndex);
+        updated.setIndex(updatedIndex);
+        updated.setCategory(updatedCategory);
+        ResultEntity updatedHeight = repository.save(updated);
+        return new ResponseIndex(updated.getId(), updated.getWeight(),updated.getHeight(),updated.getIndex(),updated.getDate(),updated.getCategory());
+
+    }
+
+    /**
+     * Определение категории по индексу
+     * @param index
+     * @return возвращает категорию
+     */
     public static String determineCategory(double index){
         String category;
         if (index<18.5){
@@ -151,6 +229,11 @@ public class BodyWeightService {
         return category;
     }
 
+    /**
+     * Сортировка по категории(точное совпадение)
+     * @param newCategory
+     * @return возвращает список DTO, имеющих искомую категорию
+     */
     public List<ResponseIndex> filterByCategory(String newCategory){
         log.debug("Фильтрация по категории: '{}'", newCategory);
         List<ResultEntity> entities = repository.findByCategory(newCategory);
@@ -164,6 +247,12 @@ public class BodyWeightService {
         return results;
     }
 
+    /**
+     * Сортировка по дате
+     * @param dateForSearching дата для поиска
+     * @return список DTO, имеющих искомую дату
+     */
+
     public List<ResponseIndex> findByDate(LocalDate dateForSearching){
         List<ResultEntity> entities = repository.findByDate(dateForSearching);
         List<ResponseIndex> resultsOfSearching = new ArrayList<>();
@@ -173,6 +262,13 @@ public class BodyWeightService {
         return  resultsOfSearching;
     }
 
+
+    /**
+     * Фильтрация  по временному периоду
+     * @param start начало диапазона
+     * @param end конец диапазона
+     * @return возвращает список DTO, подходящих под указанный период
+     */
     public List<ResponseIndex> findByDateBetween(LocalDate start, LocalDate end){
         List<ResultEntity> entities = repository.findByDateBetween(start,end);
         List<ResponseIndex> resultsOfSearching = new ArrayList<>();
@@ -181,4 +277,6 @@ public class BodyWeightService {
         }
         return  resultsOfSearching;
     }
+
+
 }

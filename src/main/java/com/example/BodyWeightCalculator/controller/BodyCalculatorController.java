@@ -1,25 +1,30 @@
 package com.example.BodyWeightCalculator.controller;
 
 
-import com.example.BodyWeightCalculator.model.RequestWeight;
-import com.example.BodyWeightCalculator.model.ResponseIndex;
-import com.example.BodyWeightCalculator.model.StatisticsData;
-import com.example.BodyWeightCalculator.model.UpdatedWeightRequest;
+import com.example.BodyWeightCalculator.model.*;
 import com.example.BodyWeightCalculator.service.BodyWeightService;
 import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
 import jdk.jfr.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * REST-контроллер для управления замерами
+ * Предоставляет эндпоинты для расчета индекса,для фильтрации результатов,для удаления замеров и для обновления информации
+ */
 @RestController
 @RequestMapping("/api")
 public class BodyCalculatorController {
@@ -32,6 +37,13 @@ public class BodyCalculatorController {
         this.service = service;
     }
 
+    /**
+     * Вычисляет BMI и сохраняет результат для указанного пользователя.
+     * @param requestWeight DTO с весом и ростом
+     * @param userId идентификатор пользователя
+     * @return созданный замер со статусом 201 Created
+     */
+
     @PostMapping("/calculator")
     public ResponseEntity<ResponseIndex> calculateBodyIndex(@Valid @RequestBody RequestWeight requestWeight, @RequestParam Long userId){
         log.info("Получен запрос на расчёт индекса: вес={}, рост={}", requestWeight.getWeight(), requestWeight.getHeight());
@@ -40,11 +52,22 @@ public class BodyCalculatorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseIndex);
     }
 
+    /**
+     * Возвращает все замеры с пагинацией.
+     * Параметры: page, size, sort (например, page=0&size=5&sort=date,desc).
+     * @param pageable параметры пагинации и сортировки
+     * @return страница с DTO замеров
+     */
     @GetMapping("/getAll")
-    public List<ResponseIndex> showResults(){
-        return new ArrayList<>(service.getAllresults());
+    public Page<ResponseIndex> showResults(Pageable pageable){  //добавлена пагинация
+        return service.getAllresults(pageable);
     }
 
+    /**
+     * Получение результатов по идентификатору
+     * @param id
+     * @return DTO
+     */
     @GetMapping("/{id}")
     public ResponseIndex getById(@PathVariable Long id){
         log.info("Запрос данных по id={}", id);
@@ -59,9 +82,11 @@ public class BodyCalculatorController {
     }
 
     @DeleteMapping("/deleteAll")
-    public void deleteAll(ServletRequest servletRequest){
+    public void deleteAll(){
         service.deleteAll();
     }
+
+
 
     @GetMapping("/statistics")
     public StatisticsData getStatistics(){
@@ -87,4 +112,11 @@ public class BodyCalculatorController {
     public List<ResponseIndex> filterByPeriod(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate){
         return  service.findByDateBetween(startDate,endDate);
     }
+
+    @PutMapping("/{id}/height")
+    public ResponseIndex updateHeightById(@PathVariable Long id, @RequestBody UpdatedHeightRequest newHeight){
+        return service.updateHeightById(id,newHeight.getNewHeight());
+    }
+
+
 }

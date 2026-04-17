@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-
+/* сущность, представляющая результаты замеров
+   связана с таблицей results
+ */
 @Entity
 @Table(name="results")
 public class ResultEntity {
@@ -18,6 +20,13 @@ public class ResultEntity {
     private double index;
     private String category;
     private LocalDate date;
+
+    /*
+    Ссылка на пользователя, которому принадлежат замеры
+    Связь многие к одному(@Many-To-One) много замеров у одного пользователя
+    @JoinColumn задает имя столбца внешнего ключа в таблице results
+    @JsonIgnore исключает поле из сериализации, чтобы избежать циклических ссылок
+     */
 
     @ManyToOne
     @JoinColumn(name="user_id")
