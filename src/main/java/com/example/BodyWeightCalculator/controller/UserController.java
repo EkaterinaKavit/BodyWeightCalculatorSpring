@@ -84,7 +84,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/statistics")
-    @Operation(summary = "Получение статистических данных пользователя по его идентификатору", description = "Принимает идентификатор пользователя")
+    @Operation(summary = "Получить статистику по замерам пользователя",
+            description = "Возвращает статистику (средний индекс, мин/макс вес, кол-во замеров) для пользователя с указанным ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Статистика успешно получена"),
+            @ApiResponse(responseCode = "404", description = "Пользователь с указанным ID не найден")
+    })
     public StatisticsData getStatisticsByUserId(@PathVariable Long id){
         return  userService.getStatisticsDataByUserId(id);
 

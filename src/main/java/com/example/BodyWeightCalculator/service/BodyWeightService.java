@@ -9,14 +9,19 @@ import com.example.BodyWeightCalculator.model.ResponseIndex;
 import com.example.BodyWeightCalculator.model.StatisticsData;
 import com.example.BodyWeightCalculator.model.UpdatedHeightRequest;
 import com.example.BodyWeightCalculator.repository.BodyWeightRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.example.BodyWeightCalculator.model.Event;
 
 
 import javax.xml.transform.Result;
@@ -34,6 +39,9 @@ public class BodyWeightService {
 
     private final ResultJPARepository repository;
     private final UserService userService;
+    private final KafkaTemplate<String,Object> kafkaTemplate;
+    private static final String BMI_TOPIC = "bmi-events";
+
     /**
      * Логгер для записи событий в файл и консоль
      */
@@ -41,9 +49,10 @@ public class BodyWeightService {
 
 
     @Autowired
-    public BodyWeightService(ResultJPARepository repository, UserService userService) {
+    public BodyWeightService(ResultJPARepository repository, UserService userService, KafkaTemplate<String,Object> kafkaTemplate) {
         this.repository = repository;
         this.userService = userService;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     /**
@@ -69,6 +78,10 @@ public class BodyWeightService {
         ResultEntity saved = repository.save(entity);
         log.info("Сохранён результат id={} для пользователя {}", saved.getId(), user.getName());
         log.debug("DTO сформирован: id={}", saved.getId());
+
+        Event event = new Event(user.getId(),saved.getId(),saved.getIndex(), saved.getCategory(), saved.getDate());
+        kafkaTemplate.send(BMI_TOPIC, event);
+        log.debug("Событие отправлено в Kafka: {}", event);
 
         //преобразуем в ResponseIndex для ответа
         return new ResponseIndex(saved.getId(), saved.getWeight(), saved.getHeight(), saved.getIndex(), saved.getDate(), saved.getCategory());
@@ -135,6 +148,7 @@ public class BodyWeightService {
      * Получение статистики: минимальный, максимальный вес,средний индекс, количество замеров
      * @return возвращает обьект класса StatisticsData, содержащий вычисленные значения
      */
+
     public StatisticsData getStatistics(){
 
         log.debug("Вычисление статистики");

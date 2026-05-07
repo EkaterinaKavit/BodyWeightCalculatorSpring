@@ -3,6 +3,10 @@ package com.example.BodyWeightCalculator.controller;
 
 import com.example.BodyWeightCalculator.model.*;
 import com.example.BodyWeightCalculator.service.BodyWeightService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
 import jdk.jfr.Category;
@@ -27,6 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api")
+@Tag(name = "BodyCalculatorController", description = "API для управления замерами")
 public class BodyCalculatorController {
 
     private final BodyWeightService service;
@@ -45,6 +50,8 @@ public class BodyCalculatorController {
      */
 
     @PostMapping("/calculator")
+    @Operation(summary = "Посчитать индекс массы тела", description = "Принимает вес,рост и идентификатор пользователя")
+
     public ResponseEntity<ResponseIndex> calculateBodyIndex(@Valid @RequestBody RequestWeight requestWeight, @RequestParam Long userId){
         log.info("Получен запрос на расчёт индекса: вес={}, рост={}", requestWeight.getWeight(), requestWeight.getHeight());
         ResponseIndex responseIndex = service.calculateIndex(requestWeight.getWeight(), requestWeight.getHeight(),userId);
@@ -59,6 +66,7 @@ public class BodyCalculatorController {
      * @return страница с DTO замеров
      */
     @GetMapping("/getAll")
+    @Operation(summary = "Показать все замеры", description = "Показывает все замеры с пагинацией")
     public Page<ResponseIndex> showResults(Pageable pageable){  //добавлена пагинация
         return service.getAllresults(pageable);
     }
@@ -69,6 +77,7 @@ public class BodyCalculatorController {
      * @return DTO
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Получить замер по идентификатору пользователя", description = "Принимает идентификатор пользователя")
     public ResponseIndex getById(@PathVariable Long id){
         log.info("Запрос данных по id={}", id);
         ResponseIndex dataById = service.getDataById(id);
@@ -77,11 +86,13 @@ public class BodyCalculatorController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить замер по идентификатору пользователя", description = "Принимает идентификатор пользователя")
     public void deleteById(@PathVariable Long id){
         service.deleteById(id);
     }
 
     @DeleteMapping("/deleteAll")
+    @Operation(summary = "Удалить все замеры", description = "Будьте осторожны при удалении, это безвозвратно")
     public void deleteAll(){
         service.deleteAll();
     }
@@ -89,31 +100,37 @@ public class BodyCalculatorController {
 
 
     @GetMapping("/statistics")
+    @Operation(summary = "Получение данных по статистике замеров")
     public StatisticsData getStatistics(){
         return service.getStatistics();
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Обновить вес в замере по идентификатору пользователя", description = "Принимает идентификатор пользователя и новый показатель веса")
     public ResponseIndex updateWeightById(@PathVariable Long id, @RequestBody UpdatedWeightRequest updatedWeight){
         return service.updateWeightById(id,updatedWeight.getUpdatedWeight());
     }
 
     @GetMapping("/filter")
+    @Operation(summary = "Фильтрация по категории", description = "Принимает название категории")
     public List<ResponseIndex> filterCategory(@RequestParam String newCategory){
         return service.filterByCategory(newCategory);
     }
 
     @GetMapping("/filter_for_date")
+    @Operation(summary = "Фильтрация по дате", description = "Принимает дату для поиска")
     public List<ResponseIndex> filterDate(@RequestParam LocalDate dateForSearching){
         return  service.findByDate(dateForSearching);
     }
 
     @GetMapping("/filter_by_date_period")
+    @Operation(summary = "Фильтрация по временному периоду", description = "Принимает начальную и конечную дату")
     public List<ResponseIndex> filterByPeriod(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate){
         return  service.findByDateBetween(startDate,endDate);
     }
 
     @PutMapping("/{id}/height")
+    @Operation(summary = "Обновить рост в замере по идентификатору пользователя", description = "Принимает идентификатор и новый показатель роста пользователя")
     public ResponseIndex updateHeightById(@PathVariable Long id, @RequestBody UpdatedHeightRequest newHeight){
         return service.updateHeightById(id,newHeight.getNewHeight());
     }

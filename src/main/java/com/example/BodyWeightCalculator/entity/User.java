@@ -19,7 +19,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)  // данная аннотация используется, чтобы id не участвовал при создании новго клиента при тестировании через Swagger
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)  // данная аннотация используется, чтобы id не участвовал при создании нового клиента при тестировании через Swagger
     private Long id;
 
     @Column(nullable = false)

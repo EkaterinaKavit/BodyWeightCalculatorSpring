@@ -6,8 +6,8 @@ POST http://localhost:8080/api/users
 Content-Type: application/json
 
 {
-  "name": "Semen Kotov",
-  "email": "kotov@yandex.ru"}
+  "name": "Alexey Kitov",
+  "email": "kitov@yandex.ru"}
 
 
 
@@ -140,6 +140,14 @@ Accept: application/json
 GET http://localhost:8080/api/users/17/statistics
 Accept: application/json
 
+
+### Создать замер для пользователя 19
+POST http://localhost:8080/api/calculator?userId=19
+Content-Type: application/json
+
+{
+  "weight":83,
+  "height": 1.90}
 
 
 

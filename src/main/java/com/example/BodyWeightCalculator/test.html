@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head><title>BMI Test</title> <meta charset="UTF-8"> </head>
+<body>
+<h1>BMI Calculator API Test</h1>
+
+<h2>Создать пользователя</h2>
+<input id="name" placeholder="Имя">
+<input id="email" placeholder="Email">
+<button onclick="createUser()">Создать</button>
+<pre id="userResult"></pre>
+
+<h2>Получить всех пользователей</h2>
+<button onclick="loadUsers()">Загрузить</button>
+<pre id="usersList"></pre>
+
+<script>
+    const API = 'http://localhost:8080/api';
+
+    async function createUser() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const res = await fetch(`${API}/users`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name, email})
+        });
+        const data = await res.json();
+        document.getElementById('userResult').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function loadUsers() {
+        const res = await fetch(`${API}/users`);
+        const users = await res.json();
+        document.getElementById('usersList').innerText = JSON.stringify(users, null, 2);
+    }
+</script>
+</body>
+</html>
